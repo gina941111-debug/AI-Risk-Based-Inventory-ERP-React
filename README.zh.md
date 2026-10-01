@@ -106,22 +106,13 @@ Demo 模式才會建立並顯示 `viewer`、`planner`、`approver` 等已知測�
 
 ### 4. Docker 啟動 React + FastAPI
 
-目前的主要決策介面是 React，FastAPI 提供風險與 ERP API；兩者已包在同一個可直接執行的映像檔中。第一次啟動時，系統會在 `data/` 建立 SQLite 虛擬資料庫；Compose 會將此資料夾掛載到主機，因此重建容器不會清空資料。
-
-```bash
-docker build -t ai-risk-inventory-erp:local .
-docker run --rm \
-  -p 5174:5174 \
-  -e ERP_DEMO_MODE=true \
-  -v "$(pwd)/data:/app/data" \
-  ai-risk-inventory-erp:local
-```
-
-開啟 <http://localhost:5174/>。也可以使用 Compose：
+目前的主要決策介面是 React，FastAPI 後端則分開打包。Docker Compose 會啟動兩個服務：Nginx 提供 React 網頁並將 `/api/` 轉送給 FastAPI。後端第一次啟動時會在 `data/` 建立 SQLite 虛擬資料庫；Compose 會將資料夾掛載到主機，因此重建容器不會清空資料。
 
 ```bash
 docker compose up --build
 ```
+
+開啟 <http://localhost:5174/>。只有前端服務會對主機開放埠號；FastAPI 留在 Compose 內部網路。前景執行時按 `Ctrl+C` 停止，也可在另一個終端機執行 `docker compose down`。
 
 ### 在其他電腦執行
 
@@ -133,7 +124,7 @@ cd AI-Risk-Based-Inventory-ERP-React
 docker compose up --build
 ```
 
-接著開啟 <http://localhost:5174/>。前景執行時按 `Ctrl+C` 停止；若以背景模式啟動，使用 `docker compose down` 停止容器。Compose 第一次啟動會建立本機 `data/` 資料夾，應用程式再於其中初始化資料庫。Demo 模式使用虛擬資料，僅供本機評估。
+接著開啟 <http://localhost:5174/>。前景執行時按 `Ctrl+C` 停止；若以背景模式啟動，使用 `docker compose down` 停止服務。Compose 第一次啟動會建立本機 `data/` 資料夾，後端再於其中初始化資料庫。Demo 模式使用虛擬資料，僅供本機評估。
 
 ### 從目前 checkout 推送更新
 
@@ -146,7 +137,7 @@ git push personal HEAD:main
 
 之後提交新修改，再執行 `git push personal HEAD:main` 更新 `main`。GitHub 可能要求登入或使用 Personal Access Token；請勿把 Token 寫進 README 或提交到 Git。
 
-容器內的 React 由 nginx 提供，`/api/` 與 `/healthz` 會轉送到同一容器內的 FastAPI。正式環境請改用秘密管理、關閉 `ERP_DEMO_MODE`，並設定 `ERP_ORGANIZATION_ID` 與模型金鑰；不要把 Demo 帳號或 SQLite 直接暴露到公網。
+前端與 API 使用不同容器：Nginx 提供 React 網頁，並將 `/api/` 與 `/healthz` 轉送到 Compose 的 `api` 服務。只有前端埠號對主機開放；FastAPI 留在 Compose 內部網路。正式環境請改用秘密管理、關閉 `ERP_DEMO_MODE`，並設定 `ERP_ORGANIZATION_ID` 與模型金鑰；不要把 Demo 帳號或 SQLite 直接暴露到公網。
 
 ## 重要設定
 

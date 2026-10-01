@@ -11,6 +11,7 @@ __pycache__
 .ruff_cache
 .codex_work
 .DS_Store
+data/
 
 web-react/node_modules
 web-react/dist

@@ -106,22 +106,13 @@ Known credentials such as `viewer`, `planner`, and `approver` are created and di
 
 ### 4. Run the React + FastAPI container
 
-The primary decision interface is now React, with FastAPI serving the risk and ERP APIs. Both are packaged in one runnable image for the first container milestone. On first startup, the app creates the SQLite demo database under `data/`; Compose mounts that folder so recreating the container does not erase local data.
-
-```bash
-docker build -t ai-risk-inventory-erp:local .
-docker run --rm \
-  -p 5174:5174 \
-  -e ERP_DEMO_MODE=true \
-  -v "$(pwd)/data:/app/data" \
-  ai-risk-inventory-erp:local
-```
-
-Open <http://localhost:5174/>. Compose is also supported:
+The primary decision interface is React, and the FastAPI backend is packaged separately. Docker Compose starts two services: Nginx serves the React build and proxies `/api/` to FastAPI. The backend creates the SQLite demo database under `data/` on first startup; Compose mounts that folder so recreating containers does not erase local data.
 
 ```bash
 docker compose up --build
 ```
+
+Open <http://localhost:5174/>. The frontend container is the only service exposed to the host; FastAPI stays on the internal Compose network. Stop the foreground services with `Ctrl+C`, or use `docker compose down` from another terminal.
 
 ### Run this project on another computer
 
@@ -133,7 +124,7 @@ cd AI-Risk-Based-Inventory-ERP-React
 docker compose up --build
 ```
 
-Open <http://localhost:5174/>. Stop with `Ctrl+C`; use `docker compose down` if the container was started in the background. Compose creates the local `data/` folder on first run, and the app initializes its demo database there. Demo mode uses synthetic data and is intended for local evaluation only.
+Open <http://localhost:5174/>. Stop with `Ctrl+C`; use `docker compose down` if the services were started in the background. Compose creates the local `data/` folder on first run, and the backend initializes its demo database there. Demo mode uses synthetic data and is intended for local evaluation only.
 
 ### Publish updates from this checkout
 
@@ -146,7 +137,7 @@ git push personal HEAD:main
 
 For later updates to `main`, commit the changes and run `git push personal HEAD:main` again. GitHub authentication may prompt you to sign in or use a personal access token; never put a token in this README or commit it to the repository.
 
-Nginx serves the React build inside the container and proxies `/api/` and `/healthz` to FastAPI. For production, use secret management, disable `ERP_DEMO_MODE`, configure `ERP_ORGANIZATION_ID` and model credentials, and do not expose demo accounts or SQLite directly to the public internet.
+The frontend and API use separate containers: Nginx serves the React build and proxies `/api/` and `/healthz` to the `api` service. Only the frontend port is published; FastAPI is reachable within the Compose network. For production, use secret management, disable `ERP_DEMO_MODE`, configure `ERP_ORGANIZATION_ID` and model credentials, and do not expose demo accounts or SQLite directly to the public internet.
 
 ## Key configuration
 

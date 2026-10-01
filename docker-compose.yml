@@ -1,18 +1,17 @@
 services:
-  riskops:
+  api:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: ai-risk-inventory-erp:local
-    ports:
-      - "5174:5174"
+      dockerfile: backend/Dockerfile
+    image: ai-risk-inventory-erp-api:local
+    expose:
+      - "8000"
     environment:
       ERP_DEMO_MODE: "true"
       ERP_DB_PATH: /app/data/erp.db
       API_CORS_ORIGINS: http://localhost:5174,http://127.0.0.1:5174
     volumes:
-      # Keep the virtual/demo database on the host so container recreation
-      # does not erase the current data.
+      # Keep the database on the host; it is created on first startup.
       - ./data:/app/data
     restart: unless-stopped
     healthcheck:
@@ -22,7 +21,30 @@ services:
         - -c
         - >-
           import urllib.request;
-          urllib.request.urlopen('http://127.0.0.1:5174/healthz', timeout=3)
+          urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ai-risk-inventory-erp-web:local
+    ports:
+      - "5174:5174"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - -q
+        - -O
+        - /dev/null
+        - http://127.0.0.1:5174/
       interval: 10s
       timeout: 5s
       retries: 5
