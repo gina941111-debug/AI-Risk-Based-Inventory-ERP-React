@@ -29,7 +29,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/ ./backend/
-COPY data/ ./data/
+RUN mkdir -p /app/data
 COPY --from=frontend-build /src/web-react/dist/ /usr/share/nginx/html/
 COPY deploy/nginx.conf /etc/nginx/nginx.conf
 COPY deploy/entrypoint.sh /usr/local/bin/erp-entrypoint

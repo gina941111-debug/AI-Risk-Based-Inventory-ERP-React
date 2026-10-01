@@ -106,7 +106,7 @@ Known credentials such as `viewer`, `planner`, and `approver` are created and di
 
 ### 4. Run the React + FastAPI container
 
-The primary decision interface is now React, with FastAPI serving the risk and ERP APIs. Both are packaged in one runnable image for the first container milestone. The SQLite demo database is mounted from `data/` so recreating the container does not erase local data.
+The primary decision interface is now React, with FastAPI serving the risk and ERP APIs. Both are packaged in one runnable image for the first container milestone. On first startup, the app creates the SQLite demo database under `data/`; Compose mounts that folder so recreating the container does not erase local data.
 
 ```bash
 docker build -t ai-risk-inventory-erp:local .
@@ -133,7 +133,7 @@ cd AI-Risk-Based-Inventory-ERP-React
 docker compose up --build
 ```
 
-Open <http://localhost:5174/>. Stop with `Ctrl+C`; use `docker compose down` if the container was started in the background. The database is kept in the local `data/` folder. Demo mode uses synthetic data and is intended for local evaluation only.
+Open <http://localhost:5174/>. Stop with `Ctrl+C`; use `docker compose down` if the container was started in the background. Compose creates the local `data/` folder on first run, and the app initializes its demo database there. Demo mode uses synthetic data and is intended for local evaluation only.
 
 ### Publish updates from this checkout
 
