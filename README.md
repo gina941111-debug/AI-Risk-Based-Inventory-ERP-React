@@ -2,8 +2,8 @@
 
 [English](README.md) | [繁體中文](README.zh.md)
 
-[![Tests](https://github.com/falltwo/AI-Risk-Based-Inventory-ERP/actions/workflows/tests.yml/badge.svg)](https://github.com/falltwo/AI-Risk-Based-Inventory-ERP/actions/workflows/tests.yml)
-[![Release](https://img.shields.io/github/v/release/falltwo/AI-Risk-Based-Inventory-ERP?display_name=tag)](https://github.com/falltwo/AI-Risk-Based-Inventory-ERP/releases)
+[![Tests](https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React/actions/workflows/tests.yml/badge.svg)](https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React/actions/workflows/tests.yml)
+[![Release](https://img.shields.io/github/v/release/gina941111-debug/AI-Risk-Based-Inventory-ERP-React?display_name=tag)](https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React/releases)
 ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B?logo=streamlit&logoColor=white)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -70,8 +70,8 @@ The governance claims above are scoped to the protected AI/Gateway procurement w
 ### 1. Install
 
 ```bash
-git clone https://github.com/falltwo/AI-Risk-Based-Inventory-ERP.git
-cd AI-Risk-Based-Inventory-ERP
+git clone https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React.git
+cd AI-Risk-Based-Inventory-ERP-React
 
 python -m venv .venv
 # Windows
@@ -103,6 +103,50 @@ streamlit run app.py
 ```
 
 Known credentials such as `viewer`, `planner`, and `approver` are created and displayed only in Demo Mode. **Use this mode only on localhost; never expose it to the public internet.**
+
+### 4. Run the React + FastAPI container
+
+The primary decision interface is now React, with FastAPI serving the risk and ERP APIs. Both are packaged in one runnable image for the first container milestone. The SQLite demo database is mounted from `data/` so recreating the container does not erase local data.
+
+```bash
+docker build -t ai-risk-inventory-erp:local .
+docker run --rm \
+  -p 5174:5174 \
+  -e ERP_DEMO_MODE=true \
+  -v "$(pwd)/data:/app/data" \
+  ai-risk-inventory-erp:local
+```
+
+Open <http://localhost:5174/>. Compose is also supported:
+
+```bash
+docker compose up --build
+```
+
+### Run this project on another computer
+
+Install Git and Docker Desktop (or Docker Engine with the Compose plugin), then:
+
+```bash
+git clone https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React.git
+cd AI-Risk-Based-Inventory-ERP-React
+docker compose up --build
+```
+
+Open <http://localhost:5174/>. Stop with `Ctrl+C`; use `docker compose down` if the container was started in the background. The database is kept in the local `data/` folder. Demo mode uses synthetic data and is intended for local evaluation only.
+
+### Publish updates from this checkout
+
+The original `origin` remote is kept unchanged. To publish this checkout to the separate personal repository, add it once as `personal`; the first command publishes the current code as the repository's `main` branch:
+
+```bash
+git remote add personal https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React.git
+git push personal HEAD:main
+```
+
+For later updates to `main`, commit the changes and run `git push personal HEAD:main` again. GitHub authentication may prompt you to sign in or use a personal access token; never put a token in this README or commit it to the repository.
+
+Nginx serves the React build inside the container and proxies `/api/` and `/healthz` to FastAPI. For production, use secret management, disable `ERP_DEMO_MODE`, configure `ERP_ORGANIZATION_ID` and model credentials, and do not expose demo accounts or SQLite directly to the public internet.
 
 ## Key configuration
 
@@ -158,8 +202,8 @@ docs/                        architecture diagrams, runbooks, and release notes
 
 ## Versions
 
-- [v1.0 Releases](https://github.com/falltwo/AI-Risk-Based-Inventory-ERP/releases)
-- [v0.1 Release](https://github.com/falltwo/AI-Risk-Based-Inventory-ERP/releases/tag/v0.1)
+- [v1.0 Releases](https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React/releases)
+- [v0.1 Release](https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React/releases/tag/v0.1)
 - [v1.0 English release notes](docs/releases/v1.0.md)
 - [v0.1 English release notes](docs/releases/v0.1.md)
 

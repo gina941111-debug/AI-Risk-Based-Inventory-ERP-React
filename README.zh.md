@@ -2,8 +2,8 @@
 
 [English](README.md) | [繁體中文](README.zh.md)
 
-[![Tests](https://github.com/falltwo/AI-Risk-Based-Inventory-ERP/actions/workflows/tests.yml/badge.svg)](https://github.com/falltwo/AI-Risk-Based-Inventory-ERP/actions/workflows/tests.yml)
-[![Release](https://img.shields.io/github/v/release/falltwo/AI-Risk-Based-Inventory-ERP?display_name=tag)](https://github.com/falltwo/AI-Risk-Based-Inventory-ERP/releases)
+[![Tests](https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React/actions/workflows/tests.yml/badge.svg)](https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React/actions/workflows/tests.yml)
+[![Release](https://img.shields.io/github/v/release/gina941111-debug/AI-Risk-Based-Inventory-ERP-React?display_name=tag)](https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React/releases)
 ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B?logo=streamlit&logoColor=white)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -70,8 +70,8 @@ v0.1 欄位依公開 repo 的初始乾淨快照整理；先前內部開發歷史
 ### 1. 安裝
 
 ```bash
-git clone https://github.com/falltwo/AI-Risk-Based-Inventory-ERP.git
-cd AI-Risk-Based-Inventory-ERP
+git clone https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React.git
+cd AI-Risk-Based-Inventory-ERP-React
 
 python -m venv .venv
 # Windows
@@ -103,6 +103,50 @@ streamlit run app.py
 ```
 
 Demo 模式才會建立並顯示 `viewer`、`planner`、`approver` 等已知測試帳密。**只能在本機展示使用，不得開放至公網。**
+
+### 4. Docker 啟動 React + FastAPI
+
+目前的主要決策介面是 React，FastAPI 提供風險與 ERP API；兩者已包在同一個可直接執行的映像檔中。SQLite 虛擬資料會掛載到主機的 `data/`，重建容器不會清空資料。
+
+```bash
+docker build -t ai-risk-inventory-erp:local .
+docker run --rm \
+  -p 5174:5174 \
+  -e ERP_DEMO_MODE=true \
+  -v "$(pwd)/data:/app/data" \
+  ai-risk-inventory-erp:local
+```
+
+開啟 <http://localhost:5174/>。也可以使用 Compose：
+
+```bash
+docker compose up --build
+```
+
+### 在其他電腦執行
+
+先安裝 Git 與 Docker Desktop（或包含 Compose 外掛的 Docker Engine），再執行：
+
+```bash
+git clone https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React.git
+cd AI-Risk-Based-Inventory-ERP-React
+docker compose up --build
+```
+
+接著開啟 <http://localhost:5174/>。前景執行時按 `Ctrl+C` 停止；若以背景模式啟動，使用 `docker compose down` 停止容器。資料庫會保存在該電腦的 `data/` 資料夾。Demo 模式使用虛擬資料，僅供本機評估。
+
+### 從目前 checkout 推送更新
+
+原本的 `origin` remote 會保留不變。第一次推送時，將個人 repo 加為 `personal`，並把目前程式碼發佈為遠端 `main` 分支：
+
+```bash
+git remote add personal https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React.git
+git push personal HEAD:main
+```
+
+之後提交新修改，再執行 `git push personal HEAD:main` 更新 `main`。GitHub 可能要求登入或使用 Personal Access Token；請勿把 Token 寫進 README 或提交到 Git。
+
+容器內的 React 由 nginx 提供，`/api/` 與 `/healthz` 會轉送到同一容器內的 FastAPI。正式環境請改用秘密管理、關閉 `ERP_DEMO_MODE`，並設定 `ERP_ORGANIZATION_ID` 與模型金鑰；不要把 Demo 帳號或 SQLite 直接暴露到公網。
 
 ## 重要設定
 
@@ -158,8 +202,8 @@ docs/                        架構圖、runbook 與 Release notes
 
 ## 版本
 
-- [v1.0 Releases](https://github.com/falltwo/AI-Risk-Based-Inventory-ERP/releases)
-- [v0.1 Release](https://github.com/falltwo/AI-Risk-Based-Inventory-ERP/releases/tag/v0.1)
+- [v1.0 Releases](https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React/releases)
+- [v0.1 Release](https://github.com/gina941111-debug/AI-Risk-Based-Inventory-ERP-React/releases/tag/v0.1)
 - [v1.0 English release notes](docs/releases/v1.0.md)
 - [v0.1 English release notes](docs/releases/v0.1.md)
 

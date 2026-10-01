@@ -1,0 +1,28 @@
+services:
+  riskops:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ai-risk-inventory-erp:local
+    ports:
+      - "5174:5174"
+    environment:
+      ERP_DEMO_MODE: "true"
+      ERP_DB_PATH: /app/data/erp.db
+      API_CORS_ORIGINS: http://localhost:5174,http://127.0.0.1:5174
+    volumes:
+      # Keep the virtual/demo database on the host so container recreation
+      # does not erase the current data.
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          urllib.request.urlopen('http://127.0.0.1:5174/healthz', timeout=3)
+      interval: 10s
+      timeout: 5s
+      retries: 5
